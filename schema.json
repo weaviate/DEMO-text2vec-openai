@@ -1,0 +1,116 @@
+{
+    "classes": [
+        {
+            "class": "Movie",
+            "description": "A cinema film",
+            "properties": [
+                {
+                    "dataType": [
+                        "int"
+                    ],
+                    "description": "The year in which the movie was released",
+                    "name": "year"
+                },
+                {
+                    "dataType": [
+                        "string"
+                    ],
+                    "description": "Movie title",
+                    "name": "title"
+                },
+                {
+                    "dataType": [
+                        "string"
+                    ],
+                    "description": "Origin of movie (i.e. American, Bollywood, Tamil, etc.)",
+                    "name": "origin"
+                },
+                {
+                    "dataType": [
+                        "Director"
+                    ],
+                    "description": "Director(s)",
+                    "name": "director"
+                },
+                {
+                    "dataType": [
+                        "Actor"
+                    ],
+                    "description": "Main actor and actresses",
+                    "name": "cast"
+                },
+                {
+                    "dataType": [
+                        "Genre"
+                    ],
+                    "description": "Movie Genre(s)",
+                    "name": "Genre"
+                },
+                {
+                    "dataType": [
+                        "string"
+                    ],
+                    "description": "URL of the Wikipedia page from which the plot description was scraped",
+                    "name": "wiki"
+                },
+                {
+                    "dataType": [
+                        "text"
+                    ],
+                    "description": "Long form description of movie plot (WARNING: May contain spoilers!!!)",
+                    "name": "plot"
+                }
+            ]
+        }, {
+            "class": "Actor",
+            "description": "Actor or actress",
+            "properties": [
+                {
+                    "dataType": [
+                        "string"
+                    ],
+                    "description": "Name of the actor",
+                    "name": "name"
+                },
+                {
+                    "dataType": [
+                        "Movie"
+                    ],
+                    "description": "Movies the actor performs in",
+                    "name": "movies"
+                }
+            ]
+        }, {
+            "class": "Genre",
+            "description": "Movie genre",
+            "properties": [
+                {
+                    "dataType": [
+                        "string"
+                    ],
+                    "description": "Name of the genre",
+                    "name": "name"
+                }
+            ]
+        }, {
+            "class": "Director",
+            "description": "Director of a movie",
+            "properties": [
+                {
+                    "dataType": [
+                        "string"
+                    ],
+                    "description": "Name of the actor",
+                    "name": "name"
+                },
+                {
+                    "dataType": [
+                        "Movie"
+                    ],
+                    "description": "Movies the actor directed",
+                    "name": "movies"
+                }
+            ]
+        }
+    ]
+}
