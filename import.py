@@ -123,6 +123,7 @@ def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
             print("⌛ The OpenAI rate limit is set to", batch_size, " per minute")
             print("⌛ Sleep for te remaining", round(60 - (stop - start)), "seconds before continuing")
             time.sleep(60 - (stop - start) + 1)
+            start = time.time()
 
     print("Add batch of Movies")
     client.batch.create_objects()
