@@ -53,8 +53,38 @@ You can query the data via the GraphQL interface that's available in the [Weavia
 
 Or you can test the example queries below.
 
-## Example Queries
+## Example Query
+
+Learn how to use the `Get{}` function of the Weaviate GraphQL-API [here](https://www.semi.technology/developers/weaviate/current/graphql-references/get.html).
 
 ```graphql
-{}
+{
+  Get {
+    Movie(
+      nearText: {
+        concepts: ["Movie about Venice"]
+      }
+      where: {
+        path: ["year"]
+        operator: LessThan
+        valueInt: 1950
+      }
+      limit: 5
+    ) {
+      title
+      plot
+      year
+      director {
+        ... on Director {
+          name
+        }
+      }
+      genre {
+        ... on Genre {
+          name
+        }
+      }
+    }
+  }
+}
 ```
