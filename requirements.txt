@@ -1,1 +1,1 @@
-weaviate_client==2.0.2
+weaviate_client==3.3.0

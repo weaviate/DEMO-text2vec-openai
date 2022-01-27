@@ -3,27 +3,29 @@
 Import data into weaviate script.
 """
 import os
+from posixpath import split
 import sys
 import json
 import time
+import uuid
 from typing import Callable, Optional
 from weaviate import Client
-from load.data import Loader
+# from load.data import Loader
 
-def upload_data_to_weaviate(data: json, callback: Callable[[dict], None]) -> None:
+def generate_uuid(key: str) -> str:
     """
-    Call function to upload data to Weaviate.
+    Generate an universally unique identifier (uuid).
     Parameters
     ----------
-    data : json
-        JSON file with the data.
-    callback : Callable[[dict], None]
-        The callback function used on the JSON file.
+    key : str
+        The key used to generate the uuid.
+    Returns
+    -------
+    str
+        Universally unique identifier (uuid) as string.
     """
 
-    with open(data) as file:
-        data = json.load(file)
-        callback(data)
+    return str(uuid.uuid3(uuid.NAMESPACE_DNS, key))
 
 def batch_callback(results: Optional[list]) -> None:
     """
@@ -40,6 +42,34 @@ def batch_callback(results: Optional[list]) -> None:
                 if 'error' in result['result']['errors']:
                     for message in result['result']['errors']['error']:
                         print(message['message'])
+
+
+def split_items(n: str, i: str):
+    return i[n].replace("Director: ", "").replace("Cast: ", "").split(",")
+
+
+def add_class_items(client: Client, name: str, data: dict, batch_size: int):
+    c = 0
+    uuid_list = []
+    for movie in data:
+        items = split_items(name, movie)
+        for item in items:
+            item = item.strip()
+            if generate_uuid(item) not in uuid_list:
+                client.batch.add_data_object({
+                    "name": item
+                }, name, generate_uuid(item))
+                uuid_list.append(generate_uuid(item))
+                c = c + 1
+                if c == batch_size:
+                    print("Add batch of", name)
+                    client.batch.create_objects()
+                    client.batch.empty_objects()
+                    c = 0
+    print("Add batch of", name)
+    client.batch.create_objects()
+    client.batch.empty_objects()
+
 
 def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
     """
@@ -61,14 +91,57 @@ def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
         callback=batch_callback,
     )
 
-    with client.batch as batch:
-        loader = Loader(batch)
+    f = open('data/movies.json')
+    data = json.load(f)
 
-        f = open('data/movies.json')
-        data = json.load(f)
+    print("Import all movie data")
+
+    # add the Directors, Cast, Genres
+    add_class_items(client, "Director", data, batch_size)
+    add_class_items(client, "Cast", data, batch_size)
+    add_class_items(client, "Genre", data, batch_size)
+
+    # add the movie
+    print("Add Movies")
+    c = 0
+    start = time.time()
+    for movie in data:
+        client.batch.add_data_object({
+            "year": int(movie["Release Year"]),
+            "title": movie["Title"],
+            "origin": movie["Origin/Ethnicity"],
+            "wiki": movie["Wiki Page"],
+            "plot": movie["Plot"]
+        }, "Movie", generate_uuid(movie["Title"]))
+        c = c + 1
+        if c == batch_size:
+            print("Add batch of Movies")
+            client.batch.create_objects()
+            client.batch.empty_objects()
+            c = 0
+            stop = time.time()
+            print("⌛ The OpenAI rate limit is set to", batch_size, " per minute")
+            print("⌛ Sleep for te remaining", round(60 - (stop - start)), "seconds before continuing")
+            time.sleep(60 - (stop - start) + 1)
+
+    print("Add batch of Movies")
+    client.batch.create_objects()
+    client.batch.empty_objects()
         
-        for movie in data:
-            loader.load_movie(data)
+    # add the crefs
+    print("Add crefs")
+    for movie in data:
+        client.batch(batch_size=1000, dynamic=True)
+        for director in split_items("Director", movie):
+            client.batch.add_reference(generate_uuid(movie["Title"]), "Movie", "director", generate_uuid(director.strip()))
+            client.batch.add_reference(generate_uuid(director.strip()), "Director", "movies", generate_uuid(movie["Title"]))
+        for actor in split_items("Cast", movie):
+            client.batch.add_reference(generate_uuid(movie["Title"]), "Movie", "cast", generate_uuid(actor.strip()))
+            client.batch.add_reference(generate_uuid(actor.strip()), "Cast", "movies", generate_uuid(movie["Title"]))
+        for genre in split_items("Genre", movie):
+            client.batch.add_reference(generate_uuid(movie["Title"]), "Movie", "genre", generate_uuid(genre.strip()))
+    client.batch.create_references()
+    print('done')
 
 def print_usage() -> None:
     """
@@ -83,7 +156,8 @@ def main():
     """
 
     nr_argv = len(sys.argv)
-    if nr_argv not in (1,2):
+
+    if nr_argv not in (2, 3):
         print(
             f"ERROR: Please provide your Weaviate url as one argument and an optional batch_size.")
         print_usage()
@@ -102,15 +176,18 @@ def main():
         wait_time_limit -= 2
         time.sleep(2.0)
 
+    # Empty the Weaviate
+    main_client.schema.delete_all()
+
     if not main_client.schema.contains():
-        print(f"\nCreating Schema")
+        print(f"Creating Schema")
         dir_path = os.path.dirname(os.path.realpath(__file__))
         schema_file = os.path.join(dir_path, "schema.json")
         main_client.schema.create(schema_file)
-        print(f"\nCreating Schema done")
+        print(f"Creating Schema done")
 
-    print(f"\nImporting data from")
-    if nr_argv == 2:
+    print(f"Importing data from dataset based on batch size:", int(sys.argv[2]))
+    if nr_argv == 3:
         upload_data_to_weaviate(
             client=main_client,
             batch_size=int(sys.argv[2])
@@ -118,7 +195,7 @@ def main():
     else:
         upload_data_to_weaviate(
             client=main_client,
-            batch_size=200
+            batch_size=100
         )
 
 

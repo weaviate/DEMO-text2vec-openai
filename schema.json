@@ -3,67 +3,127 @@
         {
             "class": "Movie",
             "description": "A cinema film",
+            "vectorIndexConfig": {
+                "vectorCacheMaxObjects": 100000,
+                "ef": 2500
+            },
+            "moduleConfig": {
+                "text2vec-openai": {  
+                    "vectorizeClassName": false,
+                    "model": "babbage",
+                    "type": "text"
+                }
+            },
             "properties": [
                 {
                     "dataType": [
                         "int"
                     ],
                     "description": "The year in which the movie was released",
-                    "name": "year"
+                    "name": "year",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": true,
+                            "vectorizePropertyName": false
+                        }
+                    }
                 },
                 {
                     "dataType": [
                         "string"
                     ],
                     "description": "Movie title",
-                    "name": "title"
+                    "name": "title",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": false,
+                            "vectorizePropertyName": false
+                        }
+                    }
                 },
                 {
                     "dataType": [
                         "string"
                     ],
                     "description": "Origin of movie (i.e. American, Bollywood, Tamil, etc.)",
-                    "name": "origin"
+                    "name": "origin",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": true,
+                            "vectorizePropertyName": false
+                        }
+                    }
                 },
                 {
                     "dataType": [
                         "Director"
                     ],
                     "description": "Director(s)",
-                    "name": "director"
+                    "name": "director",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "vectorizePropertyName": false
+                        }
+                    }
                 },
                 {
                     "dataType": [
-                        "Actor"
+                        "Cast"
                     ],
                     "description": "Main actor and actresses",
-                    "name": "cast"
+                    "name": "name",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "vectorizePropertyName": false
+                        }
+                    }
                 },
                 {
                     "dataType": [
                         "Genre"
                     ],
                     "description": "Movie Genre(s)",
-                    "name": "Genre"
+                    "name": "Genre",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "vectorizePropertyName": false
+                        }
+                    }
                 },
                 {
                     "dataType": [
                         "string"
                     ],
                     "description": "URL of the Wikipedia page from which the plot description was scraped",
-                    "name": "wiki"
+                    "name": "wiki",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": true,
+                            "vectorizePropertyName": false
+                        }
+                    }
                 },
                 {
                     "dataType": [
                         "text"
                     ],
                     "description": "Long form description of movie plot (WARNING: May contain spoilers!!!)",
-                    "name": "plot"
+                    "name": "plot",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": false,
+                            "vectorizePropertyName": false
+                        }
+                    }
                 }
             ]
         }, {
-            "class": "Actor",
-            "description": "Actor or actress",
+            "class": "Cast",
+            "description": "Cast or actress",
+            "vectorIndexConfig": {
+                "skip": true
+            },
+            "vectorizer": "none",
             "properties": [
                 {
                     "dataType": [
@@ -83,6 +143,10 @@
         }, {
             "class": "Genre",
             "description": "Movie genre",
+            "vectorizer": "none",
+            "vectorIndexConfig": {
+                "skip": true
+            },
             "properties": [
                 {
                     "dataType": [
@@ -95,6 +159,10 @@
         }, {
             "class": "Director",
             "description": "Director of a movie",
+            "vectorizer": "none",
+            "vectorIndexConfig": {
+                "skip": true
+            },
             "properties": [
                 {
                     "dataType": [
