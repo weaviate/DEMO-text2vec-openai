@@ -2,8 +2,6 @@
 
 This repository contains an example of how to use the Weaviate [text2vec-openai module](https://www.semi.technology/developers/weaviate/current/modules/text2vec-openai.html). When using this demo dataset, Weaviate will vectorize the data _and_ the queries based on OpenAI's [Babbage](https://beta.openai.com/docs/engines/babbage) model.
 
-💡 Don't want to run the container yourself? We have created an endpoint to experiment directly with this dataset _and_ the OpenAI integration [here](#).
-
 ## What is Weaviate?
 
 Weaviate is an open-source, modular vector search engine. It works like any other database you're used to (it has full [CRUD support](https://db-engines.com/en/blog_post/87), it's cloud-native, etc), but it is created around the concept of storing all data objects based on the vector representations (i.e., embeddings) of these data objects. Within Weaviate you can mix traditional, scalar search filters with vector search filters through its [GraphQL-API](https://www.semi.technology/developers/weaviate/current/graphql-references/).
