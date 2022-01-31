@@ -63,13 +63,10 @@ def add_class_items(client: Client, name: str, data: dict, batch_size: int):
                 c = c + 1
                 if c == batch_size:
                     print("Add batch of", name)
-                    client.batch.create_objects()
-                    client.batch.empty_objects()
+                    batch_callback(client.batch.create_objects())
                     c = 0
     print("Add batch of", name)
-    client.batch.create_objects()
-    client.batch.empty_objects()
-
+    batch_callback(client.batch.create_objects())
 
 def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
     """
@@ -85,10 +82,7 @@ def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
     """
 
     client.batch.configure(
-        batch_size=batch_size,
-        dynamic=True,
         timeout_retries=5,
-        callback=batch_callback,
     )
 
     f = open('data/movies.json')
@@ -116,8 +110,7 @@ def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
         c = c + 1
         if c == batch_size:
             print("Add batch of Movies")
-            client.batch.create_objects()
-            client.batch.empty_objects()
+            batch_callback(client.batch.create_objects())
             c = 0
             stop = time.time()
             print("⌛ The OpenAI rate limit is set to", batch_size, " per minute")
@@ -127,7 +120,6 @@ def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
 
     print("Add batch of Movies")
     batch_callback(client.batch.create_objects())
-    client.batch.empty_objects()
         
     # add the crefs
     print("Add crefs")
