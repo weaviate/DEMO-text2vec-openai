@@ -126,7 +126,7 @@ def upload_data_to_weaviate(client: Client, batch_size: int = 200) -> None:
             start = time.time()
 
     print("Add batch of Movies")
-    client.batch.create_objects()
+    batch_callback(client.batch.create_objects())
     client.batch.empty_objects()
         
     # add the crefs
