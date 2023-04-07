@@ -8,9 +8,10 @@
                 "ef": 2500
             },
             "moduleConfig": {
-                "text2vec-openai": {  
+                "text2vec-openai": {
                     "vectorizeClassName": false,
                     "model": "babbage",
+                    "modelVersion": "001",
                     "type": "text"
                 }
             },
